@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Path, HTTPException
 from pydantic import BaseModel, Field
 from typing import Optional
+from starlette import status
 
 app = FastAPI()
 
@@ -49,11 +50,11 @@ BOOKS = [
     Book(5, "Python 101", "Author 3", "test 1", 2, 2000)
 ]
 
-@app.get("/books")
+@app.get("/books", status_code=status.HTTP_200_OK)
 async def get_book():
     return BOOKS 
 
-@app.get("/books/")
+@app.get("/books/", status_code=status.HTTP_200_OK)
 async def read_book_by_rating(book_rating: int):
     rating_book = []
     for book in BOOKS:
@@ -62,7 +63,7 @@ async def read_book_by_rating(book_rating: int):
 
     return rating_book 
 
-@app.get("/books/published_book/")
+@app.get("/books/published_book/", status_code=status.HTTP_200_OK)
 async def read_book_by_published_date(published_date: int):
     published_book = []
     for book in BOOKS:
@@ -84,7 +85,7 @@ def find_book_id(book: Book):
     
     return book
 
-@app.get("/books/{book_id}")
+@app.get("/books/{book_id}", status_code=status.HTTP_200_OK)
 async def read_book(book_id: int = Path(gt=0)):
     for book in BOOKS:
         if book.id == book_id:
@@ -93,14 +94,19 @@ async def read_book(book_id: int = Path(gt=0)):
     raise HTTPException(status_code=404, detail="Item not found")
         
 
-@app.put("/books/update_book/")
+@app.put("/books/update_book/", status_code=status.HTTP_204_NO_CONTENT)
 async def update_book(book_update: BookRequest):
+    book_changed = False 
     for book in BOOKS:
         if book.id == book_update.id:
             book = book_update
+            book_change = True 
+    if not book_changed:
+        raise HTTPException(status_code=404, detail="Item not found")
 
-@app.delete("books/{book_id}")
+@app.delete("books/{book_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_book(book_id: int):
     for i in range(len(BOOKS)):
         if BOOKS[i].id == book_id:
             BOOKS[i].pop()
+

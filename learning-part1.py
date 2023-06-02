@@ -31,9 +31,7 @@ async def read_category_by_query(category: str):
     return books_to_return
 
 
-
-
-@app.post("books/create_book")
+@app.post("/books/create_book")
 async def create_book(new_book = Body()):
     BOOKS.append(new_book)
 

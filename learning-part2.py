@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Path
+from fastapi import FastAPI, Path, HTTPException
 from pydantic import BaseModel, Field
 from typing import Optional
 
@@ -89,6 +89,8 @@ async def read_book(book_id: int = Path(gt=0)):
     for book in BOOKS:
         if book.id == book_id:
             return book
+    
+    raise HTTPException(status_code=404, detail="Item not found")
         
 
 @app.put("/books/update_book/")
